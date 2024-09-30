@@ -6,4 +6,4 @@ Meet `saasy-events-usermgmt` – the gatekeeper of our platform. Using Python Fa
 ## 🛠️ Technologies Used
 - **Language:** Python
 - **Framework:** FastAPI
-- **Database:** MySQL (via `saasy-events-db`)
+- **Database:** MySQL (via `SaaSy-Events-database`)
