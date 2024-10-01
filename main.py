@@ -1,12 +1,14 @@
 from typing import Annotated
-from fastapi import Depends, FastAPI, Form
+from fastapi import FastAPI, Form, HTTPException
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import pymysql
 import bcrypt                                       # the library that we are going to use for hashing passwords
 import os
 from dotenv import load_dotenv, dotenv_values
+
 load_dotenv()
 
 rds_instance_pswd = os.getenv('RDS_INSTANCE_PSWD')
@@ -36,7 +38,13 @@ app.add_middleware(
     allow_origins=['*']
 )
 
-@app.post("/authorize/")
+@app.post("/authorize/",
+            responses={
+                    200: {"description": "Authorization Successful"},
+                    401: {"description": "Unauthorized - Incorrect Password"},
+                    404: {"description": "User or Organiser not found"},
+                }
+)
 async def login(email: Annotated[str, Form()], password: Annotated[str, Form()], utype: Annotated[str, Form()]):
     con = get_db_connection(utype.lower())
     table = 'org_tab' if utype.lower() == 'organiser' else 'user_tab'
@@ -47,10 +55,9 @@ async def login(email: Annotated[str, Form()], password: Annotated[str, Form()],
     con.close()
     if result is not None:
         if bcrypt.checkpw(password.encode('utf-8'), result['hashedpswd'].encode('utf-8')):
-            return {"message": f"Authorization Successful!", "User": result['name']}
-        else: return {"message": f"Authorization unsuccessful! Incorrect Password for {email}"}
-    else:
-        return {"message": f"{utype.title()} - {email} Not Found!"}
+            return JSONResponse(content={"message": f"Authorization Successful!", "User": result['name']}, status_code=200)
+        else: return JSONResponse(content={"message": f"Authorization unsuccessful! Incorrect Password for {email}"}, status_code = 401)
+    else: return JSONResponse(content={"message": f"{utype.title()} - {email} Not Found!"}, status_code = 404)
 
 
 if __name__ == "__main__":
