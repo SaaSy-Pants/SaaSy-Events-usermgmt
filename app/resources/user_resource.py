@@ -4,7 +4,6 @@ from framework.resources.base_resource import BaseResource
 
 from app.models.user import User
 from app.services.service_factory import ServiceFactory
-import pymysql
 
 class UserResource(BaseResource):
 
@@ -50,45 +49,8 @@ class UserResource(BaseResource):
 
         d_service = self.data_service
 
-        connection = pymysql.connect(
-            host = d_service.context['host'],
-            user = d_service.context['user'],
-            password = d_service.context['password'],
-            port = d_service.context['port'],
-            database = self.database
+        result = d_service.modify_data_object(
+            self.database, self.collection, user, self.key_field, user.UID
         )
-
-        result = {
-            'status': "Connection Unsuccessful",
-            'error': "DB Connection Error"
-        }
-
-        if connection is not None:
-
-            updated_user_data = {
-                "Name": user.Name,
-                "Email": user.Email,
-                "PhoneNo": user.PhoneNo,
-                "HashedPswd": user.HashedPswd,
-                "Address": user.Address,
-                "Age": user.Age
-            }
-
-
-            set_clause = ", ".join([f"{key} = '{value}'" for key, value in updated_user_data.items()])
-            query = f"UPDATE {self.collection} SET {set_clause} WHERE {self.key_field} = '{user.UID}'"
-
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                updated_count = cursor.rowcount
-
-                if updated_count == 0:
-                    result['error'] = 'Corrupt UID passed'
-                    result['status'] = "User Modification Failed"
-                else:
-                    result['error'] = None
-                    result['status'] = 'User Modification Successful'
-
 
         return result
