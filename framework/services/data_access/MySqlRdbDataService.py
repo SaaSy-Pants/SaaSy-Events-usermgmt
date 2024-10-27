@@ -128,3 +128,40 @@ class MySqlRdbDataService(BaseDataService):
             result = {"status": "failed", "error": str(e)}
 
         return result
+
+    def modify_data_object(
+            self,
+            database_name: str,
+            collection_name: str,
+            data_model: BaseModel,
+            key_field=str,
+            key_value=str
+    ):
+
+        connection = None
+        try:
+
+            set_clause = ", ".join([f"{key} = '{value}'" for key, value in data_model.model_dump().items()])
+            sql_statement = f"UPDATE {database_name}.{collection_name} SET {set_clause} WHERE {key_field}=%s"
+
+            connection = self._get_connection()
+            cursor = connection.cursor()
+            cursor.execute(sql_statement, [key_value])  # not throwing error
+            updated_count = cursor.rowcount
+            if updated_count == 0:
+                result =  {"status": "bad request", "error": f"{key_field} does not exist"}
+            else:
+                result =  {"status": "modification successful", "error": None}
+
+            return result
+
+        except Exception as e:
+            if connection is None:
+                result = {"status": "internal server error ", "error": str(e)}
+                return result
+
+            if connection and connection.open:
+                connection.close()
+
+
+
