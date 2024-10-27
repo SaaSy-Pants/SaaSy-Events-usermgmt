@@ -61,10 +61,10 @@ async def authenticate(email: Annotated[str, Form()], password: Annotated[str, F
         return JSONResponse(content={"message": f"Authorization unsuccessful! Incorrect Password for {email}"}, status_code = 401)
 
 
-@organiser_router.post("/modifyOrganiser", tags=["organisers"],
+@organiser_router.put("/modifyOrganiser", tags=["organisers"],
     responses={
-        200: {"description": "Organiser Modification Successful"},
-        400: {"description": "Corrupt Organiser Object Passed"},
+        200: {"description": "Organiser modification successful"},
+        400: {"description": "Corrupt organiser object passed"},
         500: {"description": "Database not live"}
     }
 )
@@ -73,8 +73,9 @@ async def modify_organiser(organiser: Organiser):
     resource = organiser_resource.OrganiserResource(config = None)
     result = resource.modify_data(organiser)
     if result['error'] is not None:
-        if result['error'] == 'Corrupt UID passed':
+        if result['status'] == 'bad request':
             return JSONResponse(content=result, status_code=400)
-        else: return JSONResponse(content=result, status_code=500)
+        else:
+            return JSONResponse(content=result, status_code=500)
     else:
         return JSONResponse(content=result, status_code=200)
