@@ -45,4 +45,11 @@ class OrganiserResource(BaseResource):
 
         return result
 
+    def modify_data(self, organiser: Organiser):
+        d_service = self.data_service
 
+        result = d_service.modify_data_object(
+            self.database, self.collection, organiser, self.key_field, organiser.OID
+        )
+
+        return result

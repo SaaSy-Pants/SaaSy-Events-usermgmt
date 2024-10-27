@@ -58,3 +58,22 @@ async def authenticate(email: Annotated[str, Form()], password: Annotated[str, F
         return JSONResponse(content={"message": f"Authorization Successful!, User: {result['Name']}"}, status_code=200)
     else:
         return JSONResponse(content={"message": f"Authorization unsuccessful! Incorrect Password for {email}"}, status_code = 401)
+
+@user_router.put("/modifyUser", tags=["users"],
+    responses={
+        200: {"description": "User modification successful"},
+        400: {"description": "Corrupt user object passed"},
+        500: {"description": "Database not live"}
+    }
+)
+async def modify_user(user: User):
+    user.HashedPswd = hash_password(user.HashedPswd)
+    resource = user_resource.UserResource(config = None)
+    result = resource.modify_data(user)
+    if result['error'] is not None:
+        if result['status'] == 'bad request':
+            return JSONResponse(content=result, status_code=400)
+        else:
+            return JSONResponse(content=result, status_code=500)
+    else:
+        return JSONResponse(content=result, status_code=200)

@@ -5,7 +5,6 @@ from framework.resources.base_resource import BaseResource
 from app.models.user import User
 from app.services.service_factory import ServiceFactory
 
-
 class UserResource(BaseResource):
 
     def __init__(self, config):
@@ -42,6 +41,16 @@ class UserResource(BaseResource):
 
         result = d_service.insert_data_object(
             self.database, self.collection, user
+        )
+
+        return result
+
+    def modify_data(self, user: User):
+
+        d_service = self.data_service
+
+        result = d_service.modify_data_object(
+            self.database, self.collection, user, self.key_field, user.UID
         )
 
         return result
