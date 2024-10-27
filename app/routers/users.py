@@ -61,8 +61,8 @@ async def authenticate(email: Annotated[str, Form()], password: Annotated[str, F
 
 @user_router.put("/modifyUser", tags=["users"],
     responses={
-        200: {"description": "User Modification Successful"},
-        400: {"description": "Corrupt User Object Passed"},
+        200: {"description": "User modification successful"},
+        400: {"description": "Corrupt user object passed"},
         500: {"description": "Database not live"}
     }
 )
@@ -71,8 +71,9 @@ async def modify_user(user: User):
     resource = user_resource.UserResource(config = None)
     result = resource.modify_data(user)
     if result['error'] is not None:
-        if result['error'] == 'Corrupt UID passed':
+        if result['status'] == 'bad request':
             return JSONResponse(content=result, status_code=400)
-        else: return JSONResponse(content=result, status_code=500)
+        else:
+            return JSONResponse(content=result, status_code=500)
     else:
         return JSONResponse(content=result, status_code=200)
