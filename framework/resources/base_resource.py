@@ -18,3 +18,11 @@ class BaseResource(ABC):
     @abstractmethod
     def insert_data(self, data_model: Any) -> Any:
         raise NotImplementedError()
+
+    @abstractmethod
+    def modify_data(self, data_model: Any) -> Any:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def delete_data_by_key(self, key: str) -> Any:
+        raise NotImplementedError()

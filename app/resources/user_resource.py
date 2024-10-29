@@ -54,3 +54,13 @@ class UserResource(BaseResource):
         )
 
         return result
+
+    def delete_data_by_key(self, user_id: str):
+
+        d_service = self.data_service
+
+        result = d_service.delete_data_object(
+            self.database, self.collection, self.key_field, user_id
+        )
+
+        return result

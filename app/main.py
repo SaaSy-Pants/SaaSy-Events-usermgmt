@@ -18,9 +18,9 @@ app.add_middleware(
 #Logging Middleware
 app.add_middleware(LoggingMiddleware)
 
-app.include_router(users.user_router, prefix='/users')
+app.include_router(users.user_router, prefix='/user')
 
-app.include_router(organisers.organiser_router, prefix='/organisers')
+app.include_router(organisers.organiser_router, prefix='/organiser')
 
 app.include_router(health.health_router, prefix='/health')
 

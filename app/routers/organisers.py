@@ -11,7 +11,7 @@ from app.utils.utils import hash_password, authenticate_profile
 
 organiser_router = APIRouter()
 
-@organiser_router.post("/createOrganiser", tags=["organisers"],
+@organiser_router.post(path="", tags=["organisers"],
     responses={
         200: {"description": "Organiser creation successful"},
         400: {"description": "Corrupt organiser object passed"},
@@ -61,7 +61,7 @@ async def authenticate(email: Annotated[str, Form()], password: Annotated[str, F
         return JSONResponse(content={"message": f"Authentication - Unsuccessful! Incorrect Password for {email}"}, status_code = 401)
 
 
-@organiser_router.put("/modifyOrganiser", tags=["organisers"],
+@organiser_router.put(path="", tags=["organisers"],
     responses={
         200: {"description": "Organiser modification successful"},
         400: {"description": "Corrupt organiser object passed"},
@@ -72,6 +72,25 @@ async def modify_organiser(organiser: Organiser):
     organiser.HashedPswd = hash_password(organiser.HashedPswd)
     resource = organiser_resource.OrganiserResource(config = None)
     result = resource.modify_data(organiser)
+    if result['error'] is not None:
+        if result['status'] == 'bad request':
+            return JSONResponse(content=result, status_code=400)
+        else:
+            return JSONResponse(content=result, status_code=500)
+    else:
+        return JSONResponse(content=result, status_code=200)
+
+
+@organiser_router.delete(path="/{organiserId}", tags=["organisers"],
+    responses={
+        200: {"description": "Organiser deletion successful"},
+        400: {"description": "Organiser not found"},
+        500: {"description": "Database not live"}
+    }
+)
+async def delete_organiser(organiserId: str):
+    resource = organiser_resource.OrganiserResource(config = None)
+    result = resource.delete_data_by_key(organiserId)
     if result['error'] is not None:
         if result['status'] == 'bad request':
             return JSONResponse(content=result, status_code=400)
