@@ -3,13 +3,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import users, organisers, health
+from app.middleware.logging import LoggingMiddleware
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*']
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+#Logging Middleware
+app.add_middleware(LoggingMiddleware)
 
 app.include_router(users.user_router, prefix='/users')
 
