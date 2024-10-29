@@ -10,7 +10,7 @@ from app.utils.utils import hash_password, authenticate_profile
 
 user_router = APIRouter()
 
-@user_router.post("/createUser", tags=["users"],
+@user_router.post(path="", tags=["users"],
     responses={
         200: {"description": "User creation successful"},
         400: {"description": "Corrupt user object passed"},
@@ -59,7 +59,7 @@ async def authenticate(email: Annotated[str, Form()], password: Annotated[str, F
     else:
         return JSONResponse(content={"message": f"Authentication - Unsuccessful! Incorrect Password for {email}"}, status_code = 401)
 
-@user_router.put("/modifyUser", tags=["users"],
+@user_router.put(path="", tags=["users"],
     responses={
         200: {"description": "User modification successful"},
         400: {"description": "Corrupt user object passed"},
@@ -70,6 +70,25 @@ async def modify_user(user: User):
     user.HashedPswd = hash_password(user.HashedPswd)
     resource = user_resource.UserResource(config = None)
     result = resource.modify_data(user)
+    if result['error'] is not None:
+        if result['status'] == 'bad request':
+            return JSONResponse(content=result, status_code=400)
+        else:
+            return JSONResponse(content=result, status_code=500)
+    else:
+        return JSONResponse(content=result, status_code=200)
+
+
+@user_router.delete(path="/{userId}", tags=["users"],
+    responses={
+        200: {"description": "User deletion successful"},
+        400: {"description": "User not found"},
+        500: {"description": "Database not live"}
+    }
+)
+async def delete_user(userId: str):
+    resource = user_resource.UserResource(config = None)
+    result = resource.delete_data_by_key(userId)
     if result['error'] is not None:
         if result['status'] == 'bad request':
             return JSONResponse(content=result, status_code=400)
