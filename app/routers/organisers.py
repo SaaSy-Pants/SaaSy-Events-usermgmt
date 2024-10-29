@@ -41,8 +41,8 @@ emma.brown@example.com, jjjjjjjj
 '''
 @organiser_router.post("/authenticate", tags=["organisers"],
     responses={
-        200: {"description": "Authorization Successful"},
-        401: {"description": "Unauthorized - Incorrect Password"},
+        200: {"description": "Authentication Successful"},
+        401: {"description": "Unauthenticated - Incorrect Password"},
         404: {"description": "Organiser not found"},
     }
 )
@@ -56,9 +56,9 @@ async def authenticate(email: Annotated[str, Form()], password: Annotated[str, F
         return JSONResponse(content=result, status_code=500)
 
     if authenticate_profile(password, result):
-        return JSONResponse(content={"message": f"Authorization Successful!, Organiser: {result['Name']}"}, status_code=200)
+        return JSONResponse(content={"message": f"Authentication Successful!, User: {result['Name']}"}, status_code=200)
     else:
-        return JSONResponse(content={"message": f"Authorization unsuccessful! Incorrect Password for {email}"}, status_code = 401)
+        return JSONResponse(content={"message": f"Authentication - Unsuccessful! Incorrect Password for {email}"}, status_code = 401)
 
 
 @organiser_router.put("/modifyOrganiser", tags=["organisers"],
