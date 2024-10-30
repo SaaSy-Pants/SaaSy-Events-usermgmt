@@ -69,15 +69,17 @@ async def authenticate(email: Annotated[str, Form()], password: Annotated[str, F
     resource = user_resource.UserResource(config = None)
     result = resource.get_by_custom_key("Email", email)
 
-    if result is None:
-        return JSONResponse(content={"message": f"{email} not found!"}, status_code = 404)
-    elif 'error' in result.keys(): # result is some error
-        return JSONResponse(content=result, status_code=500)
-
-    if authenticate_profile(password, result):
-        return JSONResponse(content={"message": f"Authentication Successful!, User: {result['Name']}"}, status_code=200)
+    if result['error'] is not None:
+        if result['status'] == 'bad request':
+            return JSONResponse(content={"message": f"{email} not found!"}, status_code=404)
+        else:
+            return JSONResponse(content=result, status_code=500)
     else:
-        return JSONResponse(content={"message": f"Authentication - Unsuccessful! Incorrect Password for {email}"}, status_code = 401)
+        print(result)
+        if authenticate_profile(password, result['details']):
+            return JSONResponse(content={"message": f"Authentication Successful!, User: {result['details']['Name']}"},status_code=200)
+        else:
+            return JSONResponse(content={"message": f"Authentication - Unsuccessful! Incorrect Password for {email}"},status_code=401)
 
 @user_router.put(path="", tags=["users"],
     responses={
