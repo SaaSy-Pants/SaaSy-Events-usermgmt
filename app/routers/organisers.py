@@ -39,6 +39,27 @@ sophia.garcia@example.com, hhhhhhhh
 liam.thompson@example.com, iiiiiiii
 emma.brown@example.com, jjjjjjjj
 '''
+
+@organiser_router.get(path="/{organiserId}", tags=["organisers"],
+    responses={
+        200: {"description": "Organiser fetched successfully"},
+        400: {"description": "Corrupt user object passed"},
+        500: {"description": "Database not live"},
+    }
+)
+async def get_user(organiserId: str):
+    resource = organiser_resource.OrganiserResource(config = None)
+    result = resource.get_by_key(organiserId)
+
+    if result['error'] is not None:
+        if result['status'] == 'bad request':
+            return JSONResponse(content=result, status_code=400)
+        else:
+            return JSONResponse(content=result, status_code=500)
+    else:
+        return JSONResponse(content=result, status_code=200)
+
+
 @organiser_router.post("/authenticate", tags=["organisers"],
     responses={
         200: {"description": "Authentication Successful"},

@@ -29,6 +29,26 @@ async def create_user(user: User):
     else:
         return JSONResponse(content=result, status_code=200)
 
+@user_router.get(path="/{userId}", tags=["users"],
+    responses={
+        200: {"description": "User fetched successfully"},
+        400: {"description": "Corrupt user object passed"},
+        500: {"description": "Database not live"},
+    }
+)
+async def get_user(userId: str):
+    resource = user_resource.UserResource(config = None)
+    result = resource.get_by_key(userId)
+
+    if result['error'] is not None:
+        if result['status'] == 'bad request':
+            return JSONResponse(content=result, status_code=400)
+        else:
+            return JSONResponse(content=result, status_code=500)
+    else:
+        return JSONResponse(content=result, status_code=200)
+
+
 '''
 Below are the actual credentials for users. The passwords stored in DB are hashed.
 

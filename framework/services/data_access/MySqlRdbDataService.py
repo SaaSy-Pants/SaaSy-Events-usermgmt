@@ -121,6 +121,10 @@ class MySqlRdbDataService(BaseDataService):
             cursor = connection.cursor()
             cursor.execute(sql_statement, [key_value])
             result = cursor.fetchone()
+            if cursor.rowcount == 0:
+                return {"status": "bad request", "error": f"{key_field} does not exist"}
+            else:
+                return {"status": "fetched successfully", "details": result, "error": None}
 
         except Exception as e:
             if connection and connection.open:
