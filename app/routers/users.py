@@ -12,7 +12,7 @@ user_router = APIRouter()
 
 @user_router.post(path="", tags=["users"],
     responses={
-        200: {"description": "User creation successful"},
+        201: {"description": "User creation successful"},
         400: {"description": "Corrupt user object passed"},
         500: {"description": "Database not live"},
     }
@@ -27,12 +27,12 @@ async def create_user(user: User):
         else:
             return JSONResponse(content=result, status_code=500)
     else:
-        return JSONResponse(content=result, status_code=200)
+        return JSONResponse(content=result, status_code=201)
 
 @user_router.get(path="/{userId}", tags=["users"],
     responses={
         200: {"description": "User fetched successfully"},
-        400: {"description": "Corrupt user object passed"},
+        404: {"description": "Id does not exist"},
         500: {"description": "Database not live"},
     }
 )
@@ -42,7 +42,7 @@ async def get_user(userId: str):
 
     if result['error'] is not None:
         if result['status'] == 'bad request':
-            return JSONResponse(content=result, status_code=400)
+            return JSONResponse(content=result, status_code=404)
         else:
             return JSONResponse(content=result, status_code=500)
     else:
@@ -101,8 +101,8 @@ async def modify_user(user: User):
 
 @user_router.delete(path="/{userId}", tags=["users"],
     responses={
-        200: {"description": "User deletion successful"},
-        400: {"description": "User not found"},
+        204: {"description": "User deletion successful"},
+        404: {"description": "User not found"},
         500: {"description": "Database not live"}
     }
 )
@@ -111,8 +111,8 @@ async def delete_user(userId: str):
     result = resource.delete_data_by_key(userId)
     if result['error'] is not None:
         if result['status'] == 'bad request':
-            return JSONResponse(content=result, status_code=400)
+            return JSONResponse(content=result, status_code=404)
         else:
             return JSONResponse(content=result, status_code=500)
     else:
-        return JSONResponse(content=result, status_code=200)
+        return JSONResponse(content=result, status_code=204)

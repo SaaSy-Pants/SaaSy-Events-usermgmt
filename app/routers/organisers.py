@@ -13,7 +13,7 @@ organiser_router = APIRouter()
 
 @organiser_router.post(path="", tags=["organisers"],
     responses={
-        200: {"description": "Organiser creation successful"},
+        201: {"description": "Organiser creation successful"},
         400: {"description": "Corrupt organiser object passed"},
         500: {"description": "Database not live"},
     }
@@ -28,7 +28,7 @@ async def create_organiser(organiser: Organiser):
         else:
             return JSONResponse(content=result, status_code=500)
     else:
-        return JSONResponse(content=result, status_code=200)
+        return JSONResponse(content=result, status_code=201)
 
 '''
 Below are the actual credentials for organisers. The passwords stored in DB are hashed.
@@ -43,7 +43,7 @@ emma.brown@example.com, jjjjjjjj
 @organiser_router.get(path="/{organiserId}", tags=["organisers"],
     responses={
         200: {"description": "Organiser fetched successfully"},
-        400: {"description": "Corrupt user object passed"},
+        404: {"description": "Id does not exist"},
         500: {"description": "Database not live"},
     }
 )
@@ -53,7 +53,7 @@ async def get_user(organiserId: str):
 
     if result['error'] is not None:
         if result['status'] == 'bad request':
-            return JSONResponse(content=result, status_code=400)
+            return JSONResponse(content=result, status_code=404)
         else:
             return JSONResponse(content=result, status_code=500)
     else:
@@ -104,8 +104,8 @@ async def modify_organiser(organiser: Organiser):
 
 @organiser_router.delete(path="/{organiserId}", tags=["organisers"],
     responses={
-        200: {"description": "Organiser deletion successful"},
-        400: {"description": "Organiser not found"},
+        204: {"description": "Organiser deletion successful"},
+        404: {"description": "Organiser not found"},
         500: {"description": "Database not live"}
     }
 )
@@ -114,8 +114,8 @@ async def delete_organiser(organiserId: str):
     result = resource.delete_data_by_key(organiserId)
     if result['error'] is not None:
         if result['status'] == 'bad request':
-            return JSONResponse(content=result, status_code=400)
+            return JSONResponse(content=result, status_code=404)
         else:
             return JSONResponse(content=result, status_code=500)
     else:
-        return JSONResponse(content=result, status_code=200)
+        return JSONResponse(content=result, status_code=204)
