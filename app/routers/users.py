@@ -27,6 +27,7 @@ async def create_user(user: User):
         else:
             return JSONResponse(content=result, status_code=500)
     else:
+        result['UID'] = user.UID
         return JSONResponse(content=result, status_code=201)
 
 @user_router.get(path="/{userId}", tags=["users"],
@@ -98,6 +99,7 @@ async def modify_user(user: User):
         else:
             return JSONResponse(content=result, status_code=500)
     else:
+        result['UID'] = user.UID
         return JSONResponse(content=result, status_code=200)
 
 

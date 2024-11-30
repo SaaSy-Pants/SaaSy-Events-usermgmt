@@ -28,6 +28,7 @@ async def create_organiser(organiser: Organiser):
         else:
             return JSONResponse(content=result, status_code=500)
     else:
+        result['OID'] = organiser.OID
         return JSONResponse(content=result, status_code=201)
 
 '''
@@ -99,6 +100,7 @@ async def modify_organiser(organiser: Organiser):
         else:
             return JSONResponse(content=result, status_code=500)
     else:
+        result['OID'] = organiser.OID
         return JSONResponse(content=result, status_code=200)
 
 
