@@ -26,3 +26,7 @@ class BaseResource(ABC):
     @abstractmethod
     def delete_data_by_key(self, key: str) -> Any:
         raise NotImplementedError()
+
+    @abstractmethod
+    def delete_data_by_custom_key(self, custom_key: str, value: Any) -> Any:
+        raise NotImplementedError()
