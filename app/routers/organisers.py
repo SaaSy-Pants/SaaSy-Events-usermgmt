@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from starlette.responses import JSONResponse
 
 from app.models.organiser import Organiser
 from app.resources import organiser_resource
+from app.utils.utils import extract_access_token_from_header, verify_custom_jwt
 
 organiser_router = APIRouter()
 
@@ -13,7 +14,13 @@ organiser_router = APIRouter()
         500: {"description": "Database not live"},
     }
 )
-async def create_organiser(organiser: Organiser):
+async def create_organiser(organiser: Organiser, request: Request):
+    access_token = extract_access_token_from_header(request)
+    organiser_info = verify_custom_jwt(access_token, profile='organiser')
+
+    if not organiser_info or organiser_info.get('email') != organiser.Email:
+        return JSONResponse(content={'error': 'Access denied'}, status_code=403)
+
     resource = organiser_resource.OrganiserResource(config = None)
     result = resource.insert_data(organiser)
     if result['error'] is not None:
@@ -25,7 +32,6 @@ async def create_organiser(organiser: Organiser):
         result['OID'] = organiser.OID
         return JSONResponse(content=result, status_code=201)
 
-
 @organiser_router.get(path="", tags=["organisers"],
     responses={
         200: {"description": "Organiser fetched successfully"},
@@ -33,9 +39,12 @@ async def create_organiser(organiser: Organiser):
         500: {"description": "Database not live"},
     }
 )
-async def get_organiser(organiserId: str):
+async def get_organiser(request: Request):
+    access_token = extract_access_token_from_header(request)
+    organiser_info = verify_custom_jwt(access_token, profile='organiser')
+
     resource = organiser_resource.OrganiserResource(config = None)
-    result = resource.get_by_key(organiserId)
+    result = resource.get_by_custom_key('Email', organiser_info['email'])
 
     if result['error'] is not None:
         if result['status'] == 'bad request':
@@ -53,7 +62,13 @@ async def get_organiser(organiserId: str):
         500: {"description": "Database not live"}
     }
 )
-async def modify_organiser(organiser: Organiser):
+async def modify_organiser(organiser: Organiser, request: Request):
+    access_token = extract_access_token_from_header(request)
+    organiser_info = verify_custom_jwt(access_token, profile='organiser')
+
+    if not organiser_info or organiser_info.get('email') != organiser.Email:
+        return JSONResponse(content={'error': 'Access denied'}, status_code=403)
+
     resource = organiser_resource.OrganiserResource(config = None)
     result = resource.modify_data(organiser)
     if result['error'] is not None:
@@ -73,9 +88,13 @@ async def modify_organiser(organiser: Organiser):
         500: {"description": "Database not live"}
     }
 )
-async def delete_organiser(organiserId: str):
+async def delete_organiser(request: Request):
+    access_token = extract_access_token_from_header(request)
+    organiser_info = verify_custom_jwt(access_token, profile='organiser')
+
     resource = organiser_resource.OrganiserResource(config = None)
-    result = resource.delete_data_by_key(organiserId)
+    result = resource.delete_data_by_custom_key('Email', organiser_info['email'])
+
     if result['error'] is not None:
         if result['status'] == 'bad request':
             return JSONResponse(content=result, status_code=404)

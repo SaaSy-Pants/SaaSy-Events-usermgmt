@@ -62,3 +62,13 @@ class OrganiserResource(BaseResource):
         )
 
         return result
+
+    def delete_data_by_custom_key(self, custom_key: str, value: Any) -> Organiser:
+
+        d_service = self.data_service
+
+        result = d_service.delete_data_object(
+            self.database, self.collection, key_field=custom_key, key_value=value
+        )
+
+        return result
