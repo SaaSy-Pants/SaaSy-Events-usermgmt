@@ -29,7 +29,7 @@ async def create_organiser(organiser: Organiser, request: Request):
         else:
             return JSONResponse(content=result, status_code=500)
     else:
-        result['UID'] = organiser.OID
+        result['OID'] = organiser.OID
         return JSONResponse(content=result, status_code=201)
 
 @organiser_router.get(path="", tags=["organisers"],
