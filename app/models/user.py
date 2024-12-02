@@ -7,6 +7,7 @@ class User(BaseModel):
     UID: str = constr(min_length=1, max_length=5)  # Treat as primary key in logic
     Name: str
     Email: EmailStr = constr(min_length=1, max_length=50)
+    Pic_URL: str
     PhoneNo: str = constr(min_length=1, max_length=15)
     Address: str
     Age: int
@@ -17,6 +18,7 @@ class User(BaseModel):
                 "UID": "U001",
                 "Name": "John Doe",
                 "Email": "johndoe@example.com",
+                "Pic_URL": "example.com",
                 "PhoneNo": "+1234567890",
                 "Address": "123 Main St, City, Country",
                 "Age": "30"

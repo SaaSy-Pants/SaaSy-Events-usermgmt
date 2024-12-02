@@ -38,7 +38,7 @@ async def login(request: Request):
     redirect_uri = request.url_for('auth_callback')
     query_params = request.query_params
 
-    if query_params and query_params.get('profile') and query_params['profile'].lower() == 'user' or query_params['profile'].lower() == 'organiser':
+    if query_params and (query_params.get('profile') and query_params['profile'].lower() == 'user' or query_params['profile'].lower() == 'organiser'):
         redirect_uri_with_profile = f"{redirect_uri}?{query_params}"
     else:
         return JSONResponse(status_code=400, content={'error': 'Missing or invalid query params'})
