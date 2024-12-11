@@ -7,7 +7,7 @@ from authlib.integrations.starlette_client import OAuth
 from dotenv import load_dotenv
 from fastapi import Request, APIRouter, HTTPException
 from fastapi.params import Form
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, RedirectResponse
 
 from app.resources import user_resource, organiser_resource
 from app.utils.constants import GOOGLE_AUTH_URL, GOOGLE_TOKEN_URL, GOOGLE_CERTS_URL
@@ -66,10 +66,9 @@ async def auth_callback(request: Request):
 
     jwt_token = generate_custom_jwt({'email': email, 'name': name, 'picture': picture}, profile)
 
-    #TODO: Redirect the response to the dashboard link with access token and refresh token as fragment identifiers once UI is hosted
-    #return RedirectResponse(f'http://frontend.com/dashboard#access_token={jwt_token}#refresh_token={refresh_token}')
+    return RedirectResponse(f'http://localhost:4200/dashboard#access_token={jwt_token}#refresh_token={refresh_token}')
 
-    return JSONResponse(status_code=HTTPStatus.OK, content={"access_token": jwt_token, 'refresh_token': refresh_token})
+    #return JSONResponse(status_code=HTTPStatus.OK, content={"access_token": jwt_token, 'refresh_token': refresh_token})
 
 
 @oauth_router.post("/refreshToken")
