@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Request
 from starlette.responses import JSONResponse
 
@@ -14,22 +16,24 @@ user_router = APIRouter()
         500: {"description": "Database not live"},
     }
 )
-async def create_user(user: User, request: Request):
+async def create_user(user: dict, request: Request):
     access_token = extract_access_token_from_header(request)
     user_info = verify_custom_jwt(access_token, profile='user')
 
-    if not user_info or user_info.get('email') != user.Email:
-        return JSONResponse(content={'error': 'Access denied'}, status_code=403)
+    user['UID'] = str(uuid.uuid4())
+    user['Email'] = user_info['email']
+    user['Name'] = user_info['name']
+    user['Pic_URL'] = user_info['picture']
 
     resource = user_resource.UserResource(config = None)
-    result = resource.insert_data(user)
+    result = resource.insert_data(User.model_validate(user))
     if result['error'] is not None:
         if result['status'] == 'bad request':
             return JSONResponse(content=result, status_code=400)
         else:
             return JSONResponse(content=result, status_code=500)
     else:
-        result['UID'] = user.UID
+        result['UID'] = user['UID']
         return JSONResponse(content=result, status_code=201)
 
 @user_router.get(path="", tags=["users"],
