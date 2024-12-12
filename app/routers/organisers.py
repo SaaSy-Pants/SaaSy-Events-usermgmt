@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Request
 from starlette.responses import JSONResponse
 
@@ -14,22 +16,24 @@ organiser_router = APIRouter()
         500: {"description": "Database not live"},
     }
 )
-async def create_organiser(organiser: Organiser, request: Request):
+async def create_organiser(organiser: dict, request: Request):
     access_token = extract_access_token_from_header(request)
     organiser_info = verify_custom_jwt(access_token, profile='organiser')
 
-    if not organiser_info or organiser_info.get('email') != organiser.Email:
-        return JSONResponse(content={'error': 'Access denied'}, status_code=403)
+    organiser['OID'] = str(uuid.uuid4())
+    organiser['Email'] = organiser_info['email']
+    organiser['Name'] = organiser_info['name']
+    organiser['Pic_URL'] = organiser_info['picture']
 
     resource = organiser_resource.OrganiserResource(config = None)
-    result = resource.insert_data(organiser)
+    result = resource.insert_data(Organiser.model_validate(organiser))
     if result['error'] is not None:
         if result['status'] == 'bad request':
             return JSONResponse(content=result, status_code=400)
         else:
             return JSONResponse(content=result, status_code=500)
     else:
-        result['OID'] = organiser.OID
+        result['OID'] = organiser['OID']
         return JSONResponse(content=result, status_code=201)
 
 @organiser_router.get(path="", tags=["organisers"],
@@ -45,6 +49,29 @@ async def get_organiser(request: Request):
 
     resource = organiser_resource.OrganiserResource(config = None)
     result = resource.get_by_custom_key('Email', organiser_info['email'])
+
+    if result['error'] is not None:
+        if result['status'] == 'bad request':
+            return JSONResponse(content=result, status_code=404)
+        else:
+            return JSONResponse(content=result, status_code=500)
+    else:
+        return JSONResponse(content=result, status_code=200)
+
+
+@organiser_router.get(path="/{oid}", tags=["organisers"],
+    responses={
+        200: {"description": "Organiser fetched successfully"},
+        404: {"description": "Organiser does not exist"},
+        500: {"description": "Database not live"},
+    }
+)
+async def get_organiser_by_id(oid: str, request: Request):
+    access_token = extract_access_token_from_header(request)
+    verify_custom_jwt(access_token, profile='user')
+
+    resource = organiser_resource.OrganiserResource(config = None)
+    result = resource.get_by_key(oid)
 
     if result['error'] is not None:
         if result['status'] == 'bad request':
