@@ -66,7 +66,7 @@ async def auth_callback(request: Request):
 
     jwt_token = generate_custom_jwt({'email': email, 'name': name, 'picture': picture}, profile)
 
-    return RedirectResponse(f'http://localhost:4200/dashboard#access_token={jwt_token}#refresh_token={refresh_token}')
+    return RedirectResponse(f'http://localhost:4200/dashboard/{profile}#access_token={jwt_token}#refresh_token={refresh_token}')
 
     #return JSONResponse(status_code=HTTPStatus.OK, content={"access_token": jwt_token, 'refresh_token': refresh_token})
 

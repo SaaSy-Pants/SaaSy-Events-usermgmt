@@ -59,6 +59,29 @@ async def get_user(request: Request):
         return JSONResponse(content=result, status_code=200)
 
 
+@user_router.get(path="/{uid}", tags=["users"],
+    responses={
+        200: {"description": "User fetched successfully"},
+        404: {"description": "User does not exist"},
+        500: {"description": "Database not live"},
+    }
+)
+async def get_user_by_id(uid: str, request: Request):
+    access_token = extract_access_token_from_header(request)
+    verify_custom_jwt(access_token, profile='organiser')
+
+    resource = user_resource.UserResource(config = None)
+    result = resource.get_by_key(uid)
+
+    if result['error'] is not None:
+        if result['status'] == 'bad request':
+            return JSONResponse(content=result, status_code=404)
+        else:
+            return JSONResponse(content=result, status_code=500)
+    else:
+        return JSONResponse(content=result, status_code=200)
+
+
 @user_router.put(path="", tags=["users"],
     responses={
         200: {"description": "User modification successful"},
