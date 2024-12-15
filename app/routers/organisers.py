@@ -14,7 +14,8 @@ organiser_router = APIRouter()
         201: {"description": "Organiser creation successful"},
         400: {"description": "Corrupt organiser object passed"},
         500: {"description": "Database not live"},
-    }
+    },
+    description="This endpoint creates a new organiser in the system."
 )
 async def create_organiser(organiser: dict, request: Request):
     access_token = extract_access_token_from_header(request)
@@ -41,7 +42,8 @@ async def create_organiser(organiser: dict, request: Request):
         200: {"description": "Organiser fetched successfully"},
         404: {"description": "Organiser does not exist"},
         500: {"description": "Database not live"},
-    }
+    },
+    description="This endpoint retrieves the details of the organiser associated with the logged-in organiser."
 )
 async def get_organiser(request: Request):
     access_token = extract_access_token_from_header(request)
@@ -64,7 +66,8 @@ async def get_organiser(request: Request):
         200: {"description": "Organiser fetched successfully"},
         404: {"description": "Organiser does not exist"},
         500: {"description": "Database not live"},
-    }
+    },
+    description="This endpoint fetches organiser details using their unique ID (OID)."
 )
 async def get_organiser_by_id(oid: str, request: Request):
     access_token = extract_access_token_from_header(request)
@@ -87,7 +90,8 @@ async def get_organiser_by_id(oid: str, request: Request):
         200: {"description": "Organiser modification successful"},
         400: {"description": "Corrupt organiser object passed"},
         500: {"description": "Database not live"}
-    }
+    },
+    description="This endpoint updates organiser details."
 )
 async def modify_organiser(organiser: Organiser, request: Request):
     access_token = extract_access_token_from_header(request)
@@ -113,7 +117,8 @@ async def modify_organiser(organiser: Organiser, request: Request):
         204: {"description": "Organiser deletion successful"},
         404: {"description": "Organiser not found"},
         500: {"description": "Database not live"}
-    }
+    },
+    description="This endpoint deletes the organiser's account from the system."
 )
 async def delete_organiser(request: Request):
     access_token = extract_access_token_from_header(request)

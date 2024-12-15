@@ -33,7 +33,7 @@ oauth.register(
 
 oauth_router = APIRouter()
 
-@oauth_router.get(path = "")
+@oauth_router.get(path = "", description="This endpoint initiates the OAuth login process for a user or organiser based on query parameters.")
 async def login(request: Request):
     redirect_uri = request.url_for('auth_callback')
     query_params = request.query_params
@@ -48,6 +48,7 @@ async def login(request: Request):
 
 @oauth_router.route("/auth/callback")
 async def auth_callback(request: Request):
+    """This endpoint handles the OAuth callback, processes the user's information, and generates a custom JWT."""
     profile = request.query_params.get('profile')
     response = await oauth.google.authorize_access_token(request)
 
@@ -68,10 +69,10 @@ async def auth_callback(request: Request):
 
     return RedirectResponse(f'http://localhost:4200/dashboard/{profile}#access_token={jwt_token}#refresh_token={refresh_token}')
 
-    #return JSONResponse(status_code=HTTPStatus.OK, content={"access_token": jwt_token, 'refresh_token': refresh_token})
+    # return JSONResponse(status_code=HTTPStatus.OK, content={"access_token": jwt_token, 'refresh_token': refresh_token})
 
 
-@oauth_router.post("/refreshToken")
+@oauth_router.post("/refreshToken", description="This endpoint refreshes the access token using the provided Google refresh token and generates a new custom JWT")
 async def refresh_access_token(refresh_token: Annotated[str, Form()], request: Request):
     url = GOOGLE_TOKEN_URL
     data = {
