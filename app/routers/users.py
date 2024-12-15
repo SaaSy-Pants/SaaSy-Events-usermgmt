@@ -14,7 +14,8 @@ user_router = APIRouter()
         201: {"description": "User creation successful"},
         400: {"description": "Corrupt user object passed"},
         500: {"description": "Database not live"},
-    }
+    },
+    description="This endpoint creates a new user with the given details."
 )
 async def create_user(user: dict, request: Request):
     access_token = extract_access_token_from_header(request)
@@ -41,7 +42,8 @@ async def create_user(user: dict, request: Request):
         200: {"description": "User fetched successfully"},
         404: {"description": "User does not exist"},
         500: {"description": "Database not live"},
-    }
+    },
+    description="This endpoint fetches the user details using their email address."
 )
 async def get_user(request: Request):
     access_token = extract_access_token_from_header(request)
@@ -64,7 +66,8 @@ async def get_user(request: Request):
         200: {"description": "User fetched successfully"},
         404: {"description": "User does not exist"},
         500: {"description": "Database not live"},
-    }
+    },
+    description="This endpoint fetches a user by their unique UID."
 )
 async def get_user_by_id(uid: str, request: Request):
     access_token = extract_access_token_from_header(request)
@@ -87,7 +90,8 @@ async def get_user_by_id(uid: str, request: Request):
         200: {"description": "User modification successful"},
         400: {"description": "Corrupt user object passed"},
         500: {"description": "Database not live"}
-    }
+    },
+    description="This endpoint modifies the details of an existing user."
 )
 async def modify_user(user: User, request: Request):
     access_token = extract_access_token_from_header(request)
@@ -113,7 +117,8 @@ async def modify_user(user: User, request: Request):
         204: {"description": "User deletion successful"},
         404: {"description": "User not found"},
         500: {"description": "Database not live"}
-    }
+    },
+    description="This endpoint deletes a user by their email address."
 )
 async def delete_user(request: Request):
     access_token = extract_access_token_from_header(request)

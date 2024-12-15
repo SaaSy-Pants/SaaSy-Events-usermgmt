@@ -8,7 +8,8 @@ from app.services.service_factory import ServiceFactory
 
 health_router = APIRouter()
 
-@health_router.get("/users", tags=["health"])
+@health_router.get("/users", tags=["health"],
+                   description="This endpoint checks the health and connectivity of the User Resource database.")
 async def health_check_users():
     # Get the database service
     data_service = ServiceFactory.get_service("UserResourceDataService")
@@ -25,7 +26,8 @@ async def health_check_users():
         return JSONResponse(content = {'status': 'connection failed', 'message': str(e)}, status_code=500)
 
 
-@health_router.get("/organisers", tags=["health"])
+@health_router.get("/organisers", tags=["health"],
+                   description="This endpoint checks the health and connectivity of the Organiser Resource database.")
 async def health_check_organisers():
     # Get the database service
     data_service = ServiceFactory.get_service("UserResourceDataService")

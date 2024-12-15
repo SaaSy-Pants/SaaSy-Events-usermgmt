@@ -8,6 +8,8 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.routers import users, organisers, health, oauth
 from app.middleware.logging import LoggingMiddleware
 
+from app.routers.usergql import schema  # Import GraphQL schema
+from strawberry.fastapi import GraphQLRouter
 app = FastAPI()
 
 app.add_middleware(
@@ -32,6 +34,11 @@ app.include_router(organisers.organiser_router, prefix='/organiser')
 app.include_router(health.health_router, prefix='/health')
 
 app.include_router(oauth.oauth_router, prefix='/login')
+
+# Creates GraphQL Router
+graphql_app = GraphQLRouter(schema)
+# Include the GraphQL endpoint
+app.include_router(graphql_app, prefix="/GQL/getuser", tags=["GraphQL"])
 
 @app.get("/")
 async def root():
