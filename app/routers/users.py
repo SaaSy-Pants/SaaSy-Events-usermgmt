@@ -35,6 +35,7 @@ async def create_user(user: dict, request: Request):
             return JSONResponse(content=result, status_code=500)
     else:
         result['UID'] = user['UID']
+        result['Email'] = user['Email']
         return JSONResponse(content=result, status_code=201)
 
 @user_router.get(path="", tags=["users"],
